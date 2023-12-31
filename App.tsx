@@ -4,13 +4,14 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import List from './src/views/List';
 import Details from './src/views/Details';
+import { RootStackParamList } from './src/types';
 
 export default function App() {
-  const Stack = createNativeStackNavigator();
+  const Stack = createNativeStackNavigator<RootStackParamList>();
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name='My Todos' component={List}></Stack.Screen>
+      <Stack.Navigator initialRouteName='MyTodos'>
+        <Stack.Screen name='MyTodos' component={List}></Stack.Screen>
         <Stack.Screen name='Details' component={Details}></Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
