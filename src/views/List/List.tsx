@@ -4,7 +4,7 @@ import { RootStackParamList, Todo } from "../../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { FIRESTORE_DB } from "../../../firebaseConfig";
-import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import { DocumentData, DocumentReference, addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import ListItem from "../../components/ListItem";
 type ListProps = NativeStackScreenProps<RootStackParamList, 'MyTodos'>;
 
@@ -38,14 +38,30 @@ const List: FC<ListProps> = ({navigation}) => {
     setTodo('');
   }
 
-  const handleDelete = async () => {
-    Alert.alert('Deleteado');
-
+  const handleDelete = async (ref: DocumentReference<DocumentData, DocumentData>) => {
+    Alert.alert(
+      'Confirmation',
+      'Are you sure you want to delete this task?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          onPress: () => {
+            // User clicked on "Delete"
+            deleteDoc(ref);
+            Alert.alert('Task deleted successfully');
+          },
+        },
+      ],
+      { cancelable: false },
+    );
   }
 
-  const handleMark = async () => {
-    Alert.alert('Marcado');
-
+  const handleMark = async (ref: DocumentReference<DocumentData, DocumentData>, item: Todo) => {
+    updateDoc(ref, {done: !item.done})
   }
 
 
@@ -61,7 +77,7 @@ const List: FC<ListProps> = ({navigation}) => {
         <Button title="Add todo" onPress={addNewTodo} disabled={todo === ''}></Button>
         </View>
       </View>
-      <View style={styles.scrollcontainer}>
+      <View>
         {/* Se pasan los elementos a la función que se hace cargo de proyectarlos y en data se pasan los elementos. */}
         <FlatList
           data={todos}
@@ -101,8 +117,5 @@ const styles = StyleSheet.create({
   },
   buttoncontainer:{
     marginLeft: 12,
-  },
-  scrollcontainer: {
-    marginTop: 20,
   },
 })

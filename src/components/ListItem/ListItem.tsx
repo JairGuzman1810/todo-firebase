@@ -3,27 +3,31 @@ import React, { FC } from 'react'
 import { Todo } from '../../types'
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Entypo } from '@expo/vector-icons'; 
+import { DocumentData, DocumentReference, doc } from 'firebase/firestore';
+import { FIRESTORE_DB } from '../../../firebaseConfig';
 
 
 
 
 interface TodoListProps {
     item: Todo;
-    onDelete: () => void;
-    onMark: () => void;
+    onDelete: (ref: DocumentReference<DocumentData, DocumentData>) => void;
+    onMark: (ref: DocumentReference<DocumentData, DocumentData>, item: Todo) => void;
 }
 
 
 
 const ListItem: FC<TodoListProps> = ({item, onDelete, onMark}) => {
+  const ref = doc(FIRESTORE_DB, `todos/${item.id}`);
+
   return (
     <View style={styles.todocontainer}>
-      <TouchableOpacity onPress={onMark} style={styles.todo}>
-        {item.done ? <Ionicons name='md-checkmark-circle' size={24} /> : <Entypo name="circle" size={24} color="black" />}
-        <Text style={styles.todotext}>{item.title}</Text>
+      <TouchableOpacity onPress={() => onMark(ref, item)} style={styles.todo}>
+        {item.done ? <Ionicons name='md-checkmark-circle' size={32} color={"green"} /> : <Entypo name="circle" size={30} color="black" />}
+        <Text style={item.done ? styles.todotextdone : styles.todotext}>{item.title}</Text>
       </TouchableOpacity>
-    <Ionicons name='trash-bin-outline' size={24} color={"red"} onPress={onDelete}/>
-
+      {item.done && <Ionicons name='trash-bin-outline' size={24} color={"red"} onPress={() => onDelete(ref)}/>
+}
     </View>
   )
 };
@@ -49,6 +53,12 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 4,
     },
+    todotextdone:{
+      fontWeight: 'bold',
+      flex: 1,
+      paddingHorizontal: 4,
+      textDecorationLine: 'line-through',
+  },
 })
 
 
