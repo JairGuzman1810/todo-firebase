@@ -5,7 +5,7 @@ export type RootStackParamList = {
   };
 
 export type Todo = {
-    id?: string,
+    id: string,
     title: string,
     done: boolean,
   }

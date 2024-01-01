@@ -1,10 +1,11 @@
-import { View, Text, Button, StyleSheet, TextInput, Alert } from "react-native";
+import { View, Text, Button, StyleSheet, TextInput, Alert, FlatList } from "react-native";
 import React, { FC, useEffect, useState } from "react";
 import { RootStackParamList, Todo } from "../../types";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { FIRESTORE_DB } from "../../../firebaseConfig";
 import { addDoc, collection, onSnapshot } from "firebase/firestore";
+import ListItem from "../../components/ListItem";
 type ListProps = NativeStackScreenProps<RootStackParamList, 'MyTodos'>;
 
 const List: FC<ListProps> = ({navigation}) => {
@@ -21,11 +22,11 @@ const List: FC<ListProps> = ({navigation}) => {
         snapshot.docs.forEach(doc => {
           todosSnapshot.push({
             id: doc.id,
-            ...doc.data() as Todo
-          });
+            ...doc.data() 
+          } as Todo);
+          //Se convierte as Todo para que cumpla con la estructura del tipo
         });
         setTodos(todosSnapshot);
-        console.log(todosSnapshot);
       }
     });
 
@@ -35,6 +36,16 @@ const List: FC<ListProps> = ({navigation}) => {
     const doc = await addDoc(collection(FIRESTORE_DB, 'todos'), {title: todo, done: false})
     console.log(doc);
     setTodo('');
+  }
+
+  const handleDelete = async () => {
+    Alert.alert('Deleteado');
+
+  }
+
+  const handleMark = async () => {
+    Alert.alert('Marcado');
+
   }
 
 
@@ -49,6 +60,20 @@ const List: FC<ListProps> = ({navigation}) => {
         <View style={styles.buttoncontainer}>
         <Button title="Add todo" onPress={addNewTodo} disabled={todo === ''}></Button>
         </View>
+      </View>
+      <View style={styles.scrollcontainer}>
+        {/* Se pasan los elementos a la función que se hace cargo de proyectarlos y en data se pasan los elementos. */}
+        <FlatList
+          data={todos}
+          keyExtractor={(todo: Todo) => todo.id}          
+          renderItem={({item}) => (
+            <ListItem
+              item={item}
+              onDelete={handleDelete}
+              onMark={handleMark}
+            />
+          )}
+        />
       </View>
       
     </View>
@@ -76,5 +101,8 @@ const styles = StyleSheet.create({
   },
   buttoncontainer:{
     marginLeft: 12,
-  }
+  },
+  scrollcontainer: {
+    marginTop: 20,
+  },
 })
