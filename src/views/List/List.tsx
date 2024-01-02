@@ -6,9 +6,8 @@ import { useNavigation } from "@react-navigation/native";
 import { FIRESTORE_DB } from "../../../firebaseConfig";
 import { DocumentData, DocumentReference, addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from "firebase/firestore";
 import ListItem from "../../components/ListItem";
-type ListProps = NativeStackScreenProps<RootStackParamList, 'MyTodos'>;
 
-const List: FC<ListProps> = ({navigation}) => {
+const List = () => {
 
   const [todos, setTodos] = useState<Todo[]>([]);
   const [todo, setTodo] = useState<string>('');
@@ -33,12 +32,11 @@ const List: FC<ListProps> = ({navigation}) => {
     return () => subscriber();
   }, []);
   const addNewTodo = async () => {
-    const doc = await addDoc(collection(FIRESTORE_DB, 'todos'), {title: todo, done: false})
-    console.log(doc);
+    await addDoc(collection(FIRESTORE_DB, 'todos'), {title: todo, done: false})
     setTodo('');
   }
 
-  const handleDelete = async (ref: DocumentReference<DocumentData, DocumentData>) => {
+  const handleDelete = (ref: DocumentReference<DocumentData, DocumentData>) => {
     Alert.alert(
       'Confirmation',
       'Are you sure you want to delete this task?',
@@ -49,9 +47,9 @@ const List: FC<ListProps> = ({navigation}) => {
         },
         {
           text: 'Delete',
-          onPress: () => {
+          onPress: async () => {
             // User clicked on "Delete"
-            deleteDoc(ref);
+            await deleteDoc(ref);
             Alert.alert('Task deleted successfully');
           },
         },
@@ -61,7 +59,7 @@ const List: FC<ListProps> = ({navigation}) => {
   }
 
   const handleMark = async (ref: DocumentReference<DocumentData, DocumentData>, item: Todo) => {
-    updateDoc(ref, {done: !item.done})
+    await updateDoc(ref, {done: !item.done})
   }
 
 

@@ -49,12 +49,10 @@ const styles = StyleSheet.create({
       alignItems: 'center',
     },
     todotext:{
-        fontWeight: 'bold',
         flex: 1,
         paddingHorizontal: 4,
     },
     todotextdone:{
-      fontWeight: 'bold',
       flex: 1,
       paddingHorizontal: 4,
       textDecorationLine: 'line-through',

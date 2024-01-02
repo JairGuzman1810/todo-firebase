@@ -1,18 +1,47 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import List from './src/views/List';
-import Details from './src/views/Details';
+import Login from './src/views/Login';
 import { RootStackParamList } from './src/types';
+import { useEffect, useState } from 'react';
+import { User, onAuthStateChanged, signOut } from 'firebase/auth';
+import { FIREBASE_AUTH } from './firebaseConfig';
 
 export default function App() {
+  const [user, setUser] = useState<User | null>(null);
   const Stack = createNativeStackNavigator<RootStackParamList>();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      console.log(user);
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  })
+
+  const handleLogOut = () => {
+    signOut(FIREBASE_AUTH);
+  }
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName='MyTodos'>
-        <Stack.Screen name='MyTodos' component={List}></Stack.Screen>
-        <Stack.Screen name='Details' component={Details}></Stack.Screen>
+      <Stack.Navigator initialRouteName='Login'>
+        {user ? (
+        <Stack.Screen name='MyTodos' component={List} options={{
+          headerTitle: 'MyTodos',
+          headerRight: () => (
+            <TouchableOpacity
+            onPress={handleLogOut}
+            style={styles.logoutButton}>
+              <Text style={styles.logoutButtonText}>Logout</Text>
+            </TouchableOpacity>
+          ),
+        }}></Stack.Screen>
+        ) : (
+          <Stack.Screen name='Login' component={Login}></Stack.Screen>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -24,5 +53,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  logoutButton: {
+    backgroundColor: '#007bff', // Button background color
+    padding: 10,
+    borderRadius: 5,
+    marginRight: 10,
+  },
+  logoutButtonText: {
+    color: '#fff', // Text color
   },
 });

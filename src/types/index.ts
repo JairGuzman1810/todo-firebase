@@ -1,6 +1,6 @@
 export type RootStackParamList = {
     MyTodos: undefined; // Screen with no parameters
-    Details: undefined; // Screen with no parameters
+    Login: undefined; // Screen with no parameters
     // Add more screens as needed
   };
 
